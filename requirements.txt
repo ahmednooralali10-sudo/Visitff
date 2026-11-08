@@ -1,2 +1,5 @@
 flask
 gunicorn
+requests
+urllib3
+aiohttp
