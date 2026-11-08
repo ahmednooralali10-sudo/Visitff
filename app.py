@@ -67,10 +67,21 @@ def strip_prefix(b):
 def oauth(uid,pwd):
     H={"User-Agent":"GarenaMSDK/4.0.19P4(G011A ;Android 9;en;US;)","Content-Type":"application/json; charset=utf-8"}
     try:
-        R=requests.post("https://100067.connect.garena.com/api/v2/oauth/guest/token:grant",headers=H,
-            json={"client_id":100067,"client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3",
-            "client_type":2,"device_id":"","password":pwd,"response_type":"token","uid":int(uid)},
-            verify=False,timeout=20)
+        R=requests.post(
+            "https://100067.connect.garena.com/api/v2/oauth/guest/token:grant",
+            headers=H,
+            json={
+                "client_id":100067,
+                "client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3",
+                "client_type":2,
+                "device_id":"",
+                "password":pwd,
+                "response_type":"token",
+                "uid":int(uid)
+            },
+            verify=False,
+            timeout=20
+        )
     except: return None
     if R.status_code not in(200,201): return None
     try: J=R.json()
@@ -110,13 +121,27 @@ def get_jwt(uid,pwd):
     P[104]=45174;P[105]=1
     P[106]="https://dl-bs.ggpolarbear.com/live/ABHotUpdates/|https://core-bs.ggpolarbear.com/live/ABHotUpdates/|a4332cb1c1a84e51dd77441e4856ed5a"
     P[107]="1.9393e7b8e53e8aeb"
+
+    headers_main = {
+        "User-Agent":"UnityPlayer/2018.4.12f1 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
+        "Accept":"*/*",
+        "Accept-Encoding":"deflate, gzip",
+        "X-GA-SV":str(int(time.time())),
+        "Authorization":"Bearer ",
+        "X-GA":"v1 1",
+        "ReleaseVersion":"OB55",
+        "Content-Type":"application/x-www-form-urlencoded",
+        "X-Unity-Version":"2018.4.12f1"
+    }
+
     try:
-        R=requests.post("https://loginbp.ppmainecoonghj.com/MajorLogin",
-            headers={"User-Agent":"UnityPlayer/201=False8.4.12f1 (,UnityWebRequest/1.0, libtimecurl/8.5.0-DEV)",
-out            "Accept":"*/*","Accept-Encoding":"deflate, gzip","X-GA-SV":str(int(time.time())),
-            "Authorization":"Bearer ","X-GA":"v1 1","ReleaseVersion":"OB55",
-            "Content-Type":"application/x-www-form-urlencoded","X-Unity-Version":"2018.4.12f1"},
-            data=enc(b'Yg&tc%DEuh6%Zc^8',b'6oyZDr22E3ychjM%',pb(P)),verify=False,timeout=20)
+        R=requests.post(
+            "https://loginbp.ppmainecoonghj.com/MajorLogin",
+            headers=headers_main,
+            data=enc(b'Yg&tc%DEuh6%Zc^8',b'6oyZDr22E3ychjM%',pb(P)),
+            verify=False,
+            timeout=20
+        )
     except: return None
     if R.status_code not in(200,201) or not R.content: return None
     f=parse(strip_prefix(R.content))
@@ -128,8 +153,8 @@ out            "Accept":"*/*","Accept-Encoding":"deflate, gzip","X-GA-SV":str(in
     return j.decode(),server
 
 def load_tokens():
-    to=ks=[]
-    if not os.path.exists(ACCS_PATH): return to10ks
+    toks=[]
+    if not os.path.exists(ACCS_PATH): return toks
     for ln in open(ACCS_PATH,"r",encoding="utf-8"):
         ln=ln.strip()
         if not ln or ln.startswith("#") or ":" not in ln: continue
@@ -142,14 +167,21 @@ def load_tokens():
     return toks
 
 async def visit(session,token,server,uid):
-    H={"Expect":"100-continue","Authorization":f"Bearer {token}","X-Unity-Version":"2018.4.11f1",
-        "X-GA":"v1 1","ReleaseVersion":"OB55","Content-Type":"application/x-www-form-urlencoded",
+    H={
+        "Expect":"100-continue",
+        "Authorization":f"Bearer {token}",
+        "X-Unity-Version":"2018.4.11f1",
+        "X-GA":"v1 1",
+        "ReleaseVersion":"OB55",
+        "Content-Type":"application/x-www-form-urlencoded",
         "User-Agent":"Dalvik/2.1.0 (Linux; U; Android 11; SM-A305F Build/RP1A.200720.012)",
         "Host":server.replace("https://","").replace("http://","").split("/")[0],
-        "Connection":"Keep-Alive","Accept-Encoding":"gzip"}
+        "Connection":"Keep-Alive",
+        "Accept-Encoding":"gzip"
+    }
     p=enc(b'Yg&tc%DEuh6%Zc^8',b'6oyZDr22E3ychjM%',pb({1:int(uid),2:7}))
     try:
-        async with session.post(server+"/GetPlayerPersonalShow",headers=H,data=p,ssl) as r:
+        async with session.post(server+"/GetPlayerPersonalShow",headers=H,data=p,ssl=False,timeout=10) as r:
             return r.status
     except:
         return 0
@@ -165,7 +197,6 @@ async def send(tokens,target):
         ok=sum(1 for r in results if r==200)
         return {"ok":ok,"total":len(tokens)}
 
-# ---------- cache ----------
 _CACHE={"tokens":[],"loaded_at":0.0}
 def get_tokens_cached(force=False):
     now=time.time()
@@ -186,7 +217,6 @@ def run_attack_sync(target):
     except Exception as e:
         return {"ok":False,"error":str(e),"success":0,"total":len(toks)}
 
-# ---------- HTTP ----------
 HTML = """<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FF Visit Tool</title>
