@@ -1,5 +1,6 @@
-flask
-gunicorn
-requests
-urllib3
-aiohttp
+Flask==3.0.3
+requests==2.32.3
+aiohttp==3.10.11
+urllib3==2.2.3
+pycryptodome==3.21.0
+gunicorn==23.0.0
